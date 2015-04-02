@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
   char aux[MAXLINE];
   
   if((txt = fopen(WORDS, "r")) == NULL){ //palavras a pesquisar
-    printf("erro na abertura de words.txt\n");
+    printf("erro na abertura de words\n");
     exit(1);
   }
   
