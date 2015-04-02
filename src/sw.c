@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     
     word[strlen(word)-1] = 0; //subtitui /n por 0, por causa do grep
     
-    //-xnh: nao ha falsos positivos/display linha/display file
+    //-xn: nao ha falsos positivos/display linha
     sprintf(cmd, "grep -xn %s src/%s",word, argv[1]);
     
     if(!(in = popen(cmd, "r"))){

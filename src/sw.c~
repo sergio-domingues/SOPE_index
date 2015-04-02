@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
     
     word[strlen(word)-1] = 0; //subtitui /n por 0, por causa do grep
     
-    //-xnh: nao ha falsos positivos/display linha/display file
+    //-xn: nao ha falsos positivos/display linha
     sprintf(cmd, "grep -xn %s src/%s",word, argv[1]);
     
     if(!(in = popen(cmd, "r"))){
@@ -51,8 +51,8 @@ int main(int argc, char* argv[]) {
       
       char x[] = WORDS;
       char* file = strtok(x,".");     
-      
-      //formato espeicifcado: palavra : ficheiro-linha
+         
+      //formato especifcado: palavra : ficheiro-linha
       sprintf(aux, "%s : %s-%s", word, file, n_line);
       printf("%s\n", aux);
     }
