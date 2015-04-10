@@ -11,9 +11,9 @@
 #define WRITE 1
 #define READ 0
 
-/*
- * execl/dup2 tá a merdar
- */
+
+//TODO usar funcao realpath
+//TODO ESTÁ A FUNCIONAR CORRECTAMENTE MAS -> VERIFICAR CENA DOS PATHS / MANDAR MACRO WORDS COM O CARAÇAS
 
 //argv[1] -> text file a percorrer
 //argv[2] -> numero do ficheiro a criar ; Pex 1 -> cria ficheiro temp1.txt
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
   FILE *tmp;
   char tp[20];
   sprintf(tp,"src/%s",argv[1]);
-   if((tmp = fopen(tp, "r")) == NULL){ //palavras a pesquisar
+  if((tmp = fopen(tp, "r")) == NULL){ //palavras a pesquisar
     printf("erro na abertura de texto\n");
     exit(1);
   }  
@@ -45,66 +45,58 @@ int main(int argc, char* argv[]) {
   pid_t pid;
   int fd[2]; //descritores escrita/leitura
   int status;
-  //===========
-  
-  if(pipe(fd) < 0){  //cria pipe
-    perror("Pipe error\n");
-  } 
-  
+  //===========  
   sprintf(cmd, "src/temp%s.txt", argv[2]);
-  temp = fopen(cmd,"a");       
+  temp = fopen(cmd,"a"); 
+  char *pos;
   
-   //dup2(fd[WRITE], STDOUT_FILENO); //redirecciona output
-  puts("lol");
   //pesquisa todas as palavras
   while(fgets(word, MAXLINE, txt) != NULL){
-    word[strlen(word)-1] = 0;
     
+    if((pos=strchr(word,'\n'))!=NULL){ //remove \n se existir
+      *pos='\0';
+    }
+    
+    if(pipe(fd) < 0){  //cria pipe
+    perror("Pipe error\n");
+  } 
     pid = fork();
     if(pid == -1){
       printf("Fork error\n");
       exit(1);
     }
     
-    if(pid > 0){//pai    
+    if(pid > 0){//pai   
+      close(fd[WRITE]); 
+      wait(&status); //espera pelo filho      
+            
+      char c[1], line[1];
+      int line_number = 1; 
       
-      close(fd[WRITE]);      
-      wait(&status); //espera pelo filho
-      
-      char c[1];
-      int found = 0; 
-      int ignore_til_endofline = 0;
       //lê pipe
-      while( (read(fd[READ],c, sizeof(c)) != 0) && c[1]!=0){	
+      while( (read(fd[READ],c, sizeof(c)) != 0) ){	
 	
-	if(found == 0){ //escreve palavra pesquisada 1 unica vez
-	  found = 1;
-	  char* file = strtok(argv[1],"."); //file.txt => file   
-	  
-	  fprintf(temp,"%s : %s-", word,file);		
-	}	
+	if(line_number){
+	  line[0] = c[0]; 
+	  line_number = 0;
+	}
 	
-	if(c[1] == '\n'){
-	  ignore_til_endofline = 0;
+	if(c[0] == '\n'){ //escreve palavra pesquisada 1 unica vez
+	  char* file = strtok(argv[1],"."); //file.txt => file
+	  fprintf(temp,"%s : %s-%c\n", word,file,line[0]);
+	  line_number = 1;
+	  // exit(4);
 	}
-	else if(c[1] == ':'){	  
-	  ignore_til_endofline = 1;
-	}
-	else if(ignore_til_endofline != 1)
-	  fprintf(temp,"%s",c);	
-      }
-      if(found == 1)
-	fprintf(temp,"\n");	
+	//printf("lol");
+      } 
     }
     
-    else {//filho          
-      close(fd[READ]);      
-      //printf("x");      
-      char file[30];
-      sprintf( file, "src/%s",argv[1]);      
-      //-xn: nao ha falsos positivos/display linha
-       execl("/bin/grep","/bin/grep", "-x" ,"-n",word,file,NULL); //grep -xn 1.txt texto.txt (ex)     
-      exit(1);
+    else {//filho   
+      close(fd[READ]); 
+      dup2(fd[WRITE], STDOUT_FILENO); //redirecciona output
+               
+      //-won: nao ha falsos positivos/display linha
+      execl("/bin/grep","/bin/grep", "-w" ,"-o" ,"-n",word,tp,NULL); //grep -won 1.txt texto.txt (ex)           
     }
   }
   

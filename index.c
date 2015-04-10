@@ -6,6 +6,8 @@
 #define WORDS_FILE "words.txt"
 #define TEXT_FILE "texto.txt"
 
+//TODO usar funcao realpath
+
 //CHAMA SW CORRECTAMENTE
 //por agora apenas chama sw
 //uso de pipes para passar nome do ficheiro a pesquisar ao filho ??
