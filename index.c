@@ -13,14 +13,13 @@
 int main(int argc, char* argv[]){
   
   //pid_t pid;
-    
+  FILE *in;
+  char path[20]; //src/words.txt
+  
   if(argc != 2){   
     printf("usage : %s <dir>\n\n", argv[0]);    
-  }
+  }   
   
-  FILE *in;
-  
-  char path[20]; //src/words.txt
   sprintf(path, "%s/%s", argv[1], WORDS_FILE);
   
   if((in=fopen(path,"r")) == NULL){
@@ -29,19 +28,15 @@ int main(int argc, char* argv[]){
   }
   fclose(in);
   
-  char cmd[25];  
-  sprintf(cmd , "/usr/bin/gcc -Wall -o sw src/sw.c");
-  if(!(in = popen(cmd, "r"))){
+  if(execl("/usr/bin/gcc", "-Wall","-o" , "sw", "./src/sw.c", (char*)NULL) == -1){
+    printf("error compiling sw\n");
     exit(1);
-  } 
-  pclose(in);
-  
-  sprintf(cmd, "src/sw %s", TEXT_FILE);
-
-  if(!(in = popen(cmd, "r"))){
+  }   
+    
+  if( execl("src/sw" ,TEXT_FILE , "1",NULL) == -1){
+    printf("Erro executing sw\n");
     exit(1);
-  } 
+  }
   
-  pclose(in);  
   return 0;
 }
