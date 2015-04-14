@@ -14,7 +14,7 @@
 int main(int argc, char*argv[]){
   
   if(argc != 2){  
-    printf("usage: argv[0] <index path> \n\n");
+    printf("usage: argv[0] <path> \n\n");
     exit(1);    
   }
   
@@ -87,7 +87,7 @@ int main(int argc, char*argv[]){
     int ret,print_word; 
     print_word = 0;
     
-    fputs("INDEX\n",index_final);
+    fputs("INDEX",index_final);
     
     while(fgets(line, MAXLINE, index_sort) != NULL){
       
@@ -107,7 +107,7 @@ int main(int argc, char*argv[]){
       if(print_word){      
 	print_word = 0;
 	strcpy(aux_word,word);
-	fprintf(index_final,"\n%s: %s",word,file);       
+	fprintf(index_final,"\n\n%s: %s",word,file);       
       }
       else {
 	fprintf(index_final,", %s",file);
@@ -122,7 +122,7 @@ int main(int argc, char*argv[]){
     index_sort = fopen(index_tempx, "a");    
     dup2(fileno(index_sort), STDOUT_FILENO);
     //-v com numeros no meio do texto
-    execl("/usr/bin/sort","/usr/bin/sort","-d","-V",index_temp_path ,NULL);
+    execl("/usr/bin/sort","/usr/bin/sort","-V","-f",index_temp_path ,NULL);
     printf("erro a executar sort\n\n");
   }
   

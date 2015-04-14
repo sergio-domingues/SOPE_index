@@ -1,4 +1,0 @@
-trol : texto-1
-trol : texto-2
-bora : texto-2
-bora : texto-11

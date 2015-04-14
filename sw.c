@@ -15,25 +15,28 @@
 //TODO usar funcao realpath
 //TODO ESTÁ A FUNCIONAR CORRECTAMENTE MAS -> VERIFICAR CENA DOS PATHS / MANDAR MACRO WORDS COM O CARAÇAS
 
-//argv[1] -> text file a percorrer
-//argv[2] -> numero do ficheiro a criar ; Pex 1 -> cria ficheiro temp1.txt
+//argv[1] -> path 
+//argv[2] -> ficheiro a percorrer / temp a criar
 int main(int argc, char* argv[]) {
   
   if(argc != 3){    
-    printf("usage : %s <txtfile> <temp file number>\n",argv[0]);
+    printf("usage : %s <path> <txtfile>\n",argv[0]);
     exit(1);
   }
   
   FILE *txt;  
-  if((txt = fopen(WORDS, "r")) == NULL){ //palavras a pesquisar
+  char words_path[40];
+  sprintf(words_path,"%s/%s",argv[1],WORDS);
+  
+  if((txt = fopen(words_path, "r")) == NULL){ //palavras a pesquisar
     printf("erro na abertura de words\n");
     exit(1);
   }
   
   FILE *tmp;
   char tp[20];
-  sprintf(tp,"%s",argv[1]);
-  if((tmp = fopen(tp, "r")) == NULL){ //palavras a pesquisar
+  sprintf(tp,"%s/%s.txt",argv[1],argv[2]);
+  if((tmp = fopen(tp, "r")) == NULL){ //temp a percorrer
     printf("erro na abertura de texto\n");
     exit(1);
   }  
@@ -46,7 +49,7 @@ int main(int argc, char* argv[]) {
   int fd[2]; //descritores escrita/leitura
   int status;
   //===========  
-  sprintf(cmd, "temp%s.txt", argv[2]);
+  sprintf(cmd, "%s/temp%s.txt",argv[1], argv[2]);
   temp = fopen(cmd,"a"); 
   char *pos;
   
@@ -88,8 +91,8 @@ int main(int argc, char* argv[]) {
 	}
 	
 	if(c[0] == '\n'){ //escreve palavra pesquisada 1 unica vez
-	  char* file = strtok(argv[1],"."); //file.txt => file
-	  fprintf(temp,"%s : %s-%s\n", word,file,line_index);
+	  //char* file = strtok(argv[1],"."); //file.txt => file
+	  fprintf(temp,"%s : %s-%s\n", word,argv[2],line_index);
 	  line_number = 1;
 	}
       } 
@@ -101,7 +104,7 @@ int main(int argc, char* argv[]) {
       dup2(fd[WRITE], STDOUT_FILENO); //redirecciona output
       
       //-won: nao ha falsos positivos/display linha
-      execl("/bin/grep","/bin/grep", "-w" ,"-o" ,"-n",word,tp,NULL); //grep -won 1.txt texto.txt (ex)           
+      execl("/bin/grep","/bin/grep", "-w","-o","-n",word,tp,NULL); //grep -won 1.txt texto.txt (ex)           
     }
     
   }

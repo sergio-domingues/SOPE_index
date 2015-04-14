@@ -1,3 +1,0 @@
-coiso : texto-1
-cenas : texto-2
-lel : texto-11
